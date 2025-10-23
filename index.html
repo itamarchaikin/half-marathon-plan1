@@ -1,395 +1,405 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Half Marathon Training Plan</title>
-<style>
-  body {
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f8fafc;
-    margin: 40px;
-  }
-  .week {
-    margin-bottom: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    background: white;
-    overflow: hidden;
-  }
-  summary {
-    font-size: 1.4em;
-    font-weight: 600;
-    padding: 12px 20px;
-    background: #2563eb;
-    color: white;
-    cursor: pointer;
-  }
-  details[open] summary {
-    background: #1e40af;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  th, td {
-    text-align: left;
-    padding: 10px 20px;
-  }
-  th {
-    background-color: #f1f5f9;
-    font-weight: 600;
-    border-bottom: 2px solid #e2e8f0;
-  }
-  tr:nth-child(even) {
-    background-color: #f9fafb;
-  }
-  .day {
-    font-weight: 600;
-  }
-  .done-col { width: 80px; text-align: center; }
-  .done-row td { opacity: 0.6; text-decoration: line-through; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Half Marathon Training Plan — 18 Weeks</title>
+  <meta name="description" content="Plan your 18-week half marathon training. Set a race date, auto-generate weeks, track progress, export to calendar, and print a clean schedule." />
+  <link rel="canonical" href="https://itamarchaikin.github.io/half-marathon-plan1/" />
   <meta name="theme-color" content="#2563eb" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta property="og:title" content="Half Marathon Training Plan — 18 Weeks" />
+  <meta property="og:description" content="Race-date aligned plan with progress tracking, .ics export, print mode, and accessibility built-in." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://itamarchaikin.github.io/half-marathon-plan1/" />
+  <meta name="twitter:card" content="summary" />
+  <style>
+    :root {
+      --bg: #f8fafc;         /* slate-50 */
+      --panel: #ffffff;      /* white */
+      --ink: #0f172a;        /* slate-900 */
+      --muted: #475569;      /* slate-600 */
+      --brand: #2563eb;      /* blue-600 */
+      --brand-600: #2563eb;
+      --brand-800: #1e40af;  /* blue-800 */
+      --border: #e2e8f0;     /* slate-200 */
+      --row: #f9fafb;        /* gray-50 */
+      --today: #fff7ed;      /* orange-50 */
+      --success: #10b981;    /* emerald-500 */
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b1220;       /* custom dark bg */
+        --panel: #0f172a;    /* slate-900 */
+        --ink: #e2e8f0;      /* slate-200 */
+        --muted: #94a3b8;    /* slate-400 */
+        --brand: #60a5fa;    /* blue-400 */
+        --brand-600: #60a5fa;
+        --brand-800: #3b82f6;/* blue-500 */
+        --border: #1f2937;   /* gray-800 */
+        --row: #0b1220;      
+        --today: #1a2437;    
+      }
+    }
+
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation: none !important; transition: none !important; }
+    }
+
+    body {
+      margin: 24px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.45;
+    }
+
+    a { color: var(--brand); }
+
+    .skip-link {
+      position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden;
+    }
+    .skip-link:focus { position: static; width: auto; height: auto; padding: 8px 12px; background: var(--brand); color: #fff; border-radius: 8px; }
+
+    header { max-width: 980px; margin: 0 auto 16px; }
+    header h1 { margin: 0 0 8px; font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); }
+    header p { margin: 0; color: var(--muted); }
+
+    .controls {
+      margin-top: 16px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+    .control { display: flex; flex-direction: column; gap: 6px; }
+    label { font-weight: 600; }
+    input[type="date"], select, button { font: inherit; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--panel); color: var(--ink); }
+    button.primary { background: var(--brand-600); color: white; border-color: var(--brand-600); }
+    button.secondary { background: transparent; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .actions { display: flex; gap: 8px; align-items: end; }
+
+    main { max-width: 980px; margin: 16px auto 80px; }
+
+    .week { margin-bottom: 16px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); background: var(--panel); overflow: hidden; border: 1px solid var(--border); }
+    details summary { list-style: none; cursor: pointer; padding: 14px 18px; font-weight: 700; font-size: 1.05rem; background: var(--brand-600); color: #fff; }
+    details[open] summary { background: var(--brand-800); }
+
+    table { width: 100%; border-collapse: collapse; }
+    caption { text-align: left; padding: 10px 18px; color: var(--muted); font-size: 0.95rem; }
+    thead th { text-align: left; padding: 10px 18px; background: #f1f5f9; border-bottom: 2px solid var(--border); font-weight: 700; }
+    tbody td, tbody th { padding: 10px 18px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tbody tr:nth-child(even) { background: var(--row); }
+    th[scope="row"] { font-weight: 700; }
+
+    .today { outline: 2px solid var(--brand); outline-offset: -2px; background: var(--today) !important; }
+    .done-row td, .done-row th { opacity: 0.7; text-decoration: line-through; }
+
+    .calendar-col { width: 110px; }
+    .done-col { width: 80px; text-align: center; }
+
+    .visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; }
+
+    [contenteditable="true"] { outline: 2px solid transparent; border-radius: 6px; min-height: 28px; }
+    [contenteditable="true"]:focus-visible { outline: 2px solid var(--brand); background: #fff; }
+
+    :focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+
+    footer { max-width: 980px; margin: 24px auto; color: var(--muted); }
+
+    @media print {
+      header, .controls, .actions, .calendar-col, .install, .sr-only, footer, .skip-link { display: none !important; }
+      body { background: #fff; color: #000; margin: 0; }
+      details[open] summary, details summary { background: #fff; color: #000; }
+      .week { box-shadow: none; border: none; }
+      a::after { content: " (" attr(href) ")"; font-size: 10pt; }
+      table { page-break-inside: avoid; }
+    }
+  </style>
 </head>
 <body>
-<h1>🏃‍♂️ Half Marathon Training Plan</h1>
-<button id="installBtn" style="display:none;margin:10px 0;padding:10px 14px;border:none;border-radius:10px;background:#10b981;color:white;font-weight:600;cursor:pointer">➕ התקן כאפליקציה</button>
-<p style="margin-top:6px;color:#475569;font-size:0.95em">טיפ: באייפון אפשר גם לשתף → "הוסף למסך הבית".</p>
-<p>Click each week to expand and view the training days. You can type directly into the <b>Practice</b> and <b>Notes</b> cells.</p>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header>
+    <h1>🏃‍♂️ Half Marathon Training Plan</h1>
+    <p>Set your race date to auto-build an 18-week plan. Track progress, export to calendar, and print.</p>
+    <div class="controls" role="region" aria-label="Plan controls">
+      <div class="control">
+        <label for="raceDate">Race date</label>
+        <input id="raceDate" type="date" />
+      </div>
+      <div class="control">
+        <label for="dayA">Training day A</label>
+        <select id="dayA" aria-label="Training day A"></select>
+      </div>
+      <div class="control">
+        <label for="dayB">Training day B</label>
+        <select id="dayB" aria-label="Training day B"></select>
+      </div>
+      <div class="actions">
+        <button id="update" class="primary" type="button">Update plan</button>
+        <button id="exportAll" class="secondary" type="button">Export .ics</button>
+        <button id="printBtn" class="secondary" type="button">Print</button>
+        <button id="installBtn" class="secondary install" type="button" style="display:none">Install app</button>
+      </div>
+    </div>
+  </header>
 
-<!-- Week 17 -->
-<div class="week">
-  <details>
-    <summary>Week 17</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>28/10/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>31/10/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
+  <main id="main" tabindex="-1">
+    <div id="plan" aria-live="polite"></div>
+  </main>
 
-<!-- Week 16 -->
-<div class="week">
-  <details>
-    <summary>Week 16</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>04/11/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>07/11/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
+  <footer>
+    <p>All data stays on your device (localStorage). No accounts or cookies.</p>
+  </footer>
 
-<!-- Week 15 -->
-<div class="week">
-  <details>
-    <summary>Week 15</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>11/11/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>14/11/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
+  <script type="module">
+    const STORAGE = {
+      race: 'hm_race_date', dayA: 'hm_day_a', dayB: 'hm_day_b',
+      done: (iso) => `hm_done_${iso}`,
+      practice: (iso) => `hm_practice_${iso}`,
+      notes: (iso) => `hm_notes_${iso}`,
+    };
+    const WEEK_COUNT = 18; // 0..17, where 0 is race week
 
-<!-- Week 14 -->
-<div class="week">
-  <details>
-    <summary>Week 14</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>18/11/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>21/11/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
+    const weekdays = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
-<!-- Week 13 -->
-<div class="week">
-  <details>
-    <summary>Week 13</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>25/11/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>28/11/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
+    const qs = (s, el=document) => el.querySelector(s);
+    const qsa = (s, el=document) => [...el.querySelectorAll(s)];
 
-<!-- Week 12 -->
-<div class="week">
-  <details>
-    <summary>Week 12</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>02/12/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>05/12/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
+    const pad2 = n => String(n).padStart(2,'0');
+    const toISO = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+    const fromISO = iso => { const [y,m,da] = iso.split('-').map(Number); return new Date(y, m-1, da); };
+    const human = d => `${pad2(d.getDate())}/${pad2(d.getMonth()+1)}/${String(d.getFullYear()).slice(-2)}`;
 
-<!-- Week 11 -->
-<div class="week">
-  <details>
-    <summary>Week 11</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>09/12/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>12/12/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
-
-<!-- Week 10 -->
-<div class="week">
-  <details>
-    <summary>Week 10</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>16/12/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>19/12/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
-
-<!-- Week 9 -->
-<div class="week">
-  <details>
-    <summary>Week 9</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>23/12/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>26/12/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
-
-<!-- Week 8 -->
-<div class="week">
-  <details>
-    <summary>Week 8</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>30/12/25</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>02/01/26</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
-
-<!-- Week 7 -->
-<div class="week">
-  <details>
-    <summary>Week 7</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>06/01/26</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>09/01/26</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
-
-<!-- Week 6 -->
-<div class="week">
-  <details>
-    <summary>Week 6</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>13/01/26</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>16/01/26</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
-
-<!-- Week 5 -->
-<div class="week">
-  <details>
-    <summary>Week 5</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>20/01/26</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>23/01/26</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
-
-<!-- Week 4 -->
-<div class="week">
-  <details>
-    <summary>Week 4</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>27/01/26</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>30/01/26</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
-
-<!-- Week 3 -->
-<div class="week">
-  <details>
-    <summary>Week 3</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>03/02/26</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>06/02/26</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
-
-<!-- Week 2 -->
-<div class="week">
-  <details>
-    <summary>Week 2</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>10/02/26</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>13/02/26</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
-
-<!-- Week 1 -->
-<div class="week">
-  <details>
-    <summary>Week 1</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>17/02/26</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>20/02/26</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
-
-<!-- Week 0 -->
-<div class="week">
-  <details open>
-    <summary>Week 0 (Race Week)</summary>
-    <table>
-      <tr><th>Day</th><th>Date</th><th>Practice</th><th>Notes</th></tr>
-      <tr><td class="day">Tuesday</td><td>24/02/26</td><td contenteditable="true"></td><td contenteditable="true"></td></tr>
-      <tr><td class="day">Friday</td><td>27/02/26</td><td contenteditable="true">Race Day 🏁</td><td contenteditable="true"></td></tr>
-    </table>
-  </details>
-</div>
-
-<script>
-// Add a "Done" checkbox column to every week table with localStorage persistence
-(function(){
-  function keyFor(day, dateStr){
-    // Normalize key by removing spaces and uppercasing
-    return (day + '-' + dateStr).replace(/ /g,'').toUpperCase();
-  }
-  function applyRowState(tr, checked){
-    if(checked){ tr.classList.add('done-row'); }
-    else { tr.classList.remove('done-row'); }
-  }
-  document.querySelectorAll('.week table').forEach(function(tbl){
-    // Add header cell
-    var header = tbl.querySelector('tr');
-    if(header && header.querySelector('th')){
-      var th = document.createElement('th');
-      th.textContent = 'Done';
-      th.className = 'done-col';
-      header.appendChild(th);
+    function isoDay(d){ // 0=Mon..6=Sun
+      return (d.getDay()+6)%7;
     }
-    // Add checkbox to each data row
-    tbl.querySelectorAll('tr').forEach(function(tr, idx){
-      if(idx === 0) return; // skip header
-      var tds = tr.querySelectorAll('td');
-      if(tds.length < 2) return;
-      var day = (tds[0].textContent || '').trim();
-      var dateStr = (tds[1].textContent || '').trim();
-      var td = document.createElement('td');
-      td.className = 'done-col';
-      var cb = document.createElement('input');
-      cb.type = 'checkbox';
-      var k = keyFor(day, dateStr);
-      cb.dataset.key = k;
-      try { cb.checked = localStorage.getItem('hm_done_' + k) === '1'; } catch(e) {}
-      applyRowState(tr, cb.checked);
-      cb.addEventListener('change', function(){
-        try {
-          if(cb.checked){ localStorage.setItem('hm_done_' + k, '1'); }
-          else { localStorage.removeItem('hm_done_' + k); }
-        } catch(e) {}
-        applyRowState(tr, cb.checked);
-      });
-      td.appendChild(cb);
-      tr.appendChild(td);
-    });
-  });
-})();
-</script>
+    function mondayOfWeek(d){
+      const copy = new Date(d); const diff = isoDay(copy); copy.setDate(copy.getDate()-diff); return copy;
+    }
+    function addDays(d, n){ const c = new Date(d); c.setDate(c.getDate()+n); return c; }
 
-<script>
-// --- Minimal PWA setup: dynamic manifest + inline service worker ---
-(function(){
-  // 1) Create a dynamic manifest.json (so we don't need a separate file)
-  var manifest = {
-    name: "Half Marathon Plan",
-    short_name: "HM Plan",
-    start_url: ".",
-    scope: "/",
-    display: "standalone",
-    background_color: "#ffffff",
-    theme_color: "#2563eb",
-    icons: [
-      // You can replace these with your own hosted icons later
-      { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' fill='%232563eb'/><text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='28' fill='white'>HM</text></svg>", sizes: "64x64", type: "image/svg+xml", purpose: "any maskable" }
-    ]
-  };
-  var blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-  var link = document.createElement('link');
-  link.rel = 'manifest';
-  link.href = URL.createObjectURL(blob);
-  document.head.appendChild(link);
+    function dateForWeekday(raceDate, weekdayIndex /*0..6*/, weekOffset /*0..17*/){
+      const monRace = mondayOfWeek(raceDate);
+      const monTarget = addDays(monRace, -7*weekOffset);
+      return addDays(monTarget, weekdayIndex);
+    }
 
-  // 2) Register a simple service worker using a Blob URL (no external file needed)
-  if ('serviceWorker' in navigator) {
-    var swCode = `
-      const CACHE_NAME = 'hm-plan-v1';
-      const OFFLINE_URLS = [ self.registration.scope ];
-      self.addEventListener('install', (e)=>{
-        e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(OFFLINE_URLS)));
-        self.skipWaiting();
+    function saveSetting(key, val){ try { localStorage.setItem(key, String(val)); } catch(e){} }
+    function loadSetting(key, fallback){ try { return localStorage.getItem(key) ?? fallback; } catch(e){ return fallback; } }
+
+    function loadDefaults(){
+      const defRace = '2026-02-27'; // Friday
+      const defA = 1; // Tuesday (0=Mon)
+      const defB = 4; // Friday
+      const raceISO = loadSetting(STORAGE.race, defRace);
+      const a = Number(loadSetting(STORAGE.dayA, defA));
+      const b = Number(loadSetting(STORAGE.dayB, defB));
+      return { raceISO, a, b };
+    }
+
+    function setControls({raceISO, a, b}){
+      const raceInput = qs('#raceDate');
+      raceInput.value = raceISO;
+      const dayA = qs('#dayA');
+      const dayB = qs('#dayB');
+      dayA.innerHTML = weekdays.map((w,i)=>`<option value="${i}">${w}</option>`).join('');
+      dayB.innerHTML = weekdays.map((w,i)=>`<option value="${i}">${w}</option>`).join('');
+      dayA.value = String(a); dayB.value = String(b);
+    }
+
+    function getRowKey(iso){ return iso; }
+
+    function getStored(iso){
+      const practice = localStorage.getItem(STORAGE.practice(iso)) || '';
+      const notes = localStorage.getItem(STORAGE.notes(iso)) || '';
+      const done = localStorage.getItem(STORAGE.done(iso)) === '1';
+      return { practice, notes, done };
+    }
+
+    function setStored(iso, {practice, notes, done}){
+      if(practice!=null) localStorage.setItem(STORAGE.practice(iso), practice);
+      if(notes!=null) localStorage.setItem(STORAGE.notes(iso), notes);
+      if(done!=null){ if(done) localStorage.setItem(STORAGE.done(iso),'1'); else localStorage.removeItem(STORAGE.done(iso)); }
+    }
+
+    function debounce(fn, ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; }
+
+    function buildWeekTable(weekIndex, rows){
+      const sec = document.createElement('section'); sec.className = 'week';
+      const det = document.createElement('details'); if(weekIndex===0) det.setAttribute('open','');
+      const sum = document.createElement('summary'); sum.textContent = weekIndex===0 ? 'Week 0 (Race Week)' : `Week ${weekIndex}`;
+      det.appendChild(sum);
+
+      const table = document.createElement('table');
+      const cap = document.createElement('caption'); cap.textContent = weekIndex===0 ? 'Race week schedule' : `Week ${weekIndex} schedule`;
+      const thead = document.createElement('thead');
+      const trh = document.createElement('tr');
+      ['Day','Date','Practice','Notes','Calendar','Done'].forEach((h,i)=>{
+        const th=document.createElement('th'); th.textContent=h; if(h==='Calendar') th.className='calendar-col'; if(h==='Done') th.className='done-col'; th.scope='col'; trh.appendChild(th);
       });
-      self.addEventListener('activate', (e)=>{ e.waitUntil(self.clients.claim()); });
-      self.addEventListener('fetch', (e)=>{
-        const req = e.request;
-        e.respondWith(
-          caches.match(req).then(res => res || fetch(req).then(resp => {
-            const copy = resp.clone();
-            caches.open(CACHE_NAME).then(c=>c.put(req, copy)).catch(()=>{});
-            return resp;
-          }).catch(()=> caches.match(self.registration.scope)))
+      thead.appendChild(trh);
+      const tbody = document.createElement('tbody');
+
+      rows.forEach(row=>{
+        const tr = document.createElement('tr'); tr.dataset.iso = row.iso;
+        // Day (row header)
+        const th = document.createElement('th'); th.scope='row'; th.textContent=row.dayName; tr.appendChild(th);
+        // Date
+        const tdDate = document.createElement('td'); tdDate.textContent=row.human; tdDate.dataset.iso=row.iso; tr.appendChild(tdDate);
+        // Practice (contenteditable)
+        const tdPr = document.createElement('td'); tdPr.contentEditable = 'true'; tdPr.setAttribute('role','textbox'); tdPr.setAttribute('aria-label',`Practice for ${row.dayName} ${row.human}`); tdPr.textContent = row.practice || (row.isRace ? 'Race Day 🏁' : ''); tr.appendChild(tdPr);
+        // Notes (contenteditable)
+        const tdNt = document.createElement('td'); tdNt.contentEditable='true'; tdNt.setAttribute('role','textbox'); tdNt.setAttribute('aria-label',`Notes for ${row.dayName} ${row.human}`); tdNt.textContent = row.notes || ''; tr.appendChild(tdNt);
+        // Calendar (.ics per row)
+        const tdCal = document.createElement('td'); tdCal.className='calendar-col';
+        const calBtn = document.createElement('button'); calBtn.type='button'; calBtn.textContent='Add to Calendar'; calBtn.addEventListener('click',()=>downloadICS([row])); tdCal.appendChild(calBtn); tr.appendChild(tdCal);
+        // Done checkbox
+        const tdDone = document.createElement('td'); tdDone.className='done-col';
+        const cb = document.createElement('input'); cb.type='checkbox'; cb.checked = !!row.done; cb.setAttribute('aria-label',`Mark ${row.dayName} ${row.human} as done`);
+        cb.addEventListener('change',()=>{ setStored(row.iso, {done: cb.checked}); tr.classList.toggle('done-row', cb.checked); });
+        tdDone.appendChild(cb); tr.appendChild(tdDone);
+
+        if(row.done){ tr.classList.add('done-row'); }
+        if(row.isToday){ tr.classList.add('today'); det.open = true; }
+        tbody.appendChild(tr);
+
+        // persistence for contenteditable
+        const saveDeb = debounce(()=>{
+          const practice = tdPr.textContent.trim();
+          const notes = tdNt.textContent.trim();
+          setStored(row.iso, {practice, notes});
+        }, 300);
+        tdPr.addEventListener('input', saveDeb);
+        tdNt.addEventListener('input', saveDeb);
+      });
+
+      table.appendChild(cap); table.appendChild(thead); table.appendChild(tbody); det.appendChild(table); sec.appendChild(det);
+      return sec;
+    }
+
+    function buildPlan(){
+      const plan = qs('#plan'); plan.textContent = '';
+      const raceISO = qs('#raceDate').value;
+      const dayA = Number(qs('#dayA').value);
+      const dayB = Number(qs('#dayB').value);
+      saveSetting(STORAGE.race, raceISO); saveSetting(STORAGE.dayA, dayA); saveSetting(STORAGE.dayB, dayB);
+
+      const raceDate = fromISO(raceISO);
+      const todayISO = toISO(new Date());
+
+      for(let w=17; w>=0; w--){
+        const rows = [];
+        const dA = dateForWeekday(raceDate, dayA, w);
+        const dB = dateForWeekday(raceDate, dayB, w);
+        [dA, dB].forEach((d, idx)=>{
+          const iso = toISO(d);
+          const s = getStored(iso);
+          const isRace = iso===raceISO;
+          rows.push({
+            iso,
+            human: human(d),
+            dayName: weekdays[idx===0?dayA:dayB],
+            done: s.done,
+            practice: s.practice,
+            notes: s.notes,
+            isRace,
+            isToday: iso===todayISO,
+          });
+        });
+        const sec = buildWeekTable(w, rows);
+        plan.appendChild(sec);
+      }
+    }
+
+    function icsEscape(s){ return (s||'').replace(/[\\;,]/g, m=>({"\\":"\\\\", ";":"\\;", ",":"\\,"}[m])).replace(/\n/g,'\\n'); }
+    function icsDate(iso){ return iso.replace(/-/g,''); }
+
+    function makeICS(rows){
+      const lines = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Half Marathon Plan//EN',
+      ];
+      rows.forEach(r=>{
+        const sum = r.practice?.trim() || (r.isRace ? 'Half Marathon Race' : 'Training Run');
+        const desc = r.notes?.trim() || '';
+        const uid = `hm-${r.iso}-${Math.random().toString(36).slice(2)}@local`;
+        lines.push(
+          'BEGIN:VEVENT',
+          `UID:${uid}`,
+          `DTSTAMP:${icsDate(toISO(new Date()))}T000000Z`,
+          `DTSTART;VALUE=DATE:${icsDate(r.iso)}`,
+          `SUMMARY:${icsEscape(sum)}`,
+          desc ? `DESCRIPTION:${icsEscape(desc)}` : 'DESCRIPTION:',
+          'END:VEVENT'
         );
-      });`;
-    var swBlob = new Blob([swCode], {type: 'text/javascript'});
-    var swUrl = URL.createObjectURL(swBlob);
-    navigator.serviceWorker.register(swUrl);
-  }
+      });
+      lines.push('END:VCALENDAR');
+      return lines.join('\r\n');
+    }
 
-  // 3) Install button (Android/Chrome): capture beforeinstallprompt
-  let deferredPrompt;
-  const btn = document.getElementById('installBtn');
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    btn.style.display = 'inline-block';
-  });
-  btn && btn.addEventListener('click', async()=>{
-    if(!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if(outcome === 'accepted') btn.textContent = 'מותקן ✔';
-    deferredPrompt = null;
-  });
-})();
-</script>
+    function download(filename, text, type='text/calendar'){
+      const blob = new Blob([text], {type});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
 
+    function collectAllRows(){
+      const rows = [];
+      qsa('tbody tr').forEach(tr=>{
+        const iso = tr.dataset.iso;
+        const practice = localStorage.getItem(STORAGE.practice(iso)) || tr.children[2].textContent || '';
+        const notes = localStorage.getItem(STORAGE.notes(iso)) || tr.children[3].textContent || '';
+        const isRace = iso === qs('#raceDate').value;
+        rows.push({iso, practice, notes, isRace});
+      });
+      return rows;
+    }
+
+    function downloadICS(rows){
+      const text = makeICS(rows);
+      download('half-marathon-plan.ics', text);
+    }
+
+    // Event wiring
+    qs('#update').addEventListener('click', buildPlan);
+    qs('#exportAll').addEventListener('click', ()=> downloadICS(collectAllRows()));
+    qs('#printBtn').addEventListener('click', ()=> window.print());
+
+    // Initialize controls and plan
+    const defaults = loadDefaults();
+    setControls(defaults);
+    buildPlan();
+
+    // Minimal PWA: dynamic manifest + async service worker registration
+    (function(){
+      const manifest = {
+        name: 'Half Marathon Plan', short_name: 'HM Plan', start_url: '.', scope: '/', display: 'standalone', background_color: '#ffffff', theme_color: '#2563eb',
+        icons: [
+          { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%232563eb'/><text x='50%' y='52%' font-family='Segoe UI, Arial' font-size='28' text-anchor='middle' fill='white'>HM</text></svg>", sizes: '64x64', type: 'image/svg+xml' }
+        ]
+      };
+      const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+      const link = document.createElement('link'); link.rel='manifest'; link.href = URL.createObjectURL(blob); document.head.appendChild(link);
+
+      if('serviceWorker' in navigator){
+        const swCode = `
+          const CACHE='hm-plan-v1';
+          self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./']))); self.skipWaiting();});
+          self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim());});
+          self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(resp=>{const cp=resp.clone(); caches.open(CACHE).then(c=>c.put(e.request,cp)); return resp;})).catch(()=>caches.match('./')))});
+        `;
+        const swBlob = new Blob([swCode], {type:'text/javascript'});
+        const swUrl = URL.createObjectURL(swBlob);
+        navigator.serviceWorker.register(swUrl);
+      }
+
+      let deferredPrompt; const btn = qs('#installBtn');
+      window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferredPrompt=e; btn.style.display='inline-block'; });
+      btn.addEventListener('click', async()=>{ if(!deferredPrompt) return; deferredPrompt.prompt(); const r = await deferredPrompt.userChoice; if(r.outcome==='accepted'){ btn.textContent='Installed ✓'; } deferredPrompt=null; });
+    })();
+  </script>
 </body>
 </html>
